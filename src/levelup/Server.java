@@ -424,14 +424,6 @@ public class Server {
 			}
 		}
 	}
-
-	public static void main(String[] args){
-		int[] ports = {
-				3000, 3001, 3002, 3003, 3004
-		};
-		Server server = new Server(ports); // lab computer 128.252.20.177 
-		server.run();
-	}
 }
 //lab computer 
 //using InetAddress.getLocalHost() : URB218-19/172.16.2.99
