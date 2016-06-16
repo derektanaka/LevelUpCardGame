@@ -4,7 +4,8 @@ import java.util.LinkedList;
 
 public class Trick {
 
-	public LinkedList<Play> plays;
+	public Play[] plays;
+	private LinkedList<Play> playsLL;
 	public int numCards = 0;
 	private String s;
 	//
@@ -21,16 +22,23 @@ public class Trick {
 	// 0 indicating highest, n indicating number of plays, n sets of 4 bytes indicating plays
 	public Trick(String temp){
 		this.s = temp;
-		plays = new LinkedList<Play>();
+		playsLL = new LinkedList<Play>();
 		if(Integer.parseInt(s.substring(0, 1)) > 0){
-			plays.add(parsePlay());
+			playsLL.add(parsePlay());
 		}
 		else{
 			s = s.substring(1);
 			int numPlays = parse(1);
 			for(int i = 0; i < numPlays; i++){
-				plays.add(parsePlay());
+				playsLL.add(parsePlay());
 			}
+		}
+		plays = new Play[numCards];
+		Play tempP = null;
+		int i = 0;
+		while((tempP = playsLL.peek()) != null){
+			playsLL.pop();
+			
 		}
 	}
 	
@@ -54,9 +62,10 @@ public class Trick {
 	public String toString(){
 		String ret = "";
 		Play temp =  null;
+		LinkedList<Play> tempList = playsLL;
 		int counter = 0;
-		while((temp = plays.peek()) != null){
-			plays.pop();
+		while((temp = tempList.peek()) != null){
+			tempList.pop();
 			ret += temp.toString() + "\n";
 			counter++;
 		}

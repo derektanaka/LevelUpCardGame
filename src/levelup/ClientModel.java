@@ -476,7 +476,7 @@ public class ClientModel {
 	}
 	
 	public Icon getIcon(int card){
-		String s = "datafiles/cards/" + getMatchingIcon(card) + ".gif";
+		String s = "cards/" + getMatchingIcon(card) + ".gif";
 		ImageIcon image = new ImageIcon(s);
 		return image;
 	}

@@ -12,7 +12,7 @@ public class Main {
 			}
 		};
 		serverThread.start();
-		int numAIClients = 5;
+		int numAIClients = 4;
 		for(int i = 0; i < numAIClients; i++){
 			final int q = i;
 			Thread t = new Thread(){
@@ -20,6 +20,21 @@ public class Main {
 					try {
 						//Thread.sleep(500 * q);
 						ClientAI clientServer = new ClientAI("AI Client", "localhost", (3000 + q));
+						clientServer.run();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			};
+			t.start();
+		}
+		for(int i = numAIClients; i < 5; i++){
+			final int q = i;
+			Thread t = new Thread(){
+				public void run(){
+					try {
+						//Thread.sleep(500 * q);
+						Client clientServer = new Client("Client", "localhost", (3000 + q));
 						clientServer.run();
 					} catch (Exception e) {
 						e.printStackTrace();

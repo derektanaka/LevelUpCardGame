@@ -159,6 +159,7 @@ public class Client {
 	public void runJob(String jobName){
 		//System.out.println("client:runJob:" + clientName + " jobName "+ jobName);
 		if(jobName.contains("Played:")){
+			System.out.println(jobName);
 			if(Integer.parseInt(jobName.substring(0, 1)) != clientModel.getMyPlayerNum()){
 				if(!clientModel.setHand(Integer.parseInt(jobName.substring(0, 1)), jobName)){
 					System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
