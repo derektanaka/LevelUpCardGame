@@ -18,12 +18,13 @@ public class ClientModel2{
 	public int bj = 23;
 	public LinkedList<String> toGUI = new LinkedList<String>();
 	public LinkedList<String> fromGUI = new LinkedList<String>();
+	private ArrayList<Integer> hand;
 	private ArrayList<Integer> cards;
 	private ArrayList<Integer> singles;
 	private ArrayList<Integer> pairs;
-	private ArrayList<Integer> cPairs;
+	private ArrayList<ArrayList<Integer>> cPairs;
 	private boolean startTrick;
-	private int[] startTrickInfo;
+	private String startTrickInfo;
 	/*
 	 * number of players
 my number
@@ -56,7 +57,16 @@ champion partner(s)
 			return sameSuit();
 		}
 		else{
-			return false;
+			if(cards.size() == Integer.parseInt(startTrickInfo.substring(0,1))){
+				ArrayList<Integer> suit = cardsInSuit(Integer.parseInt(startTrickInfo.substring(1,2)));
+				try{
+					String tempString = startTrickInfo.substring(2);
+				}catch(Exception e){
+					return true;
+				}
+			}
+			// need to check for pairs, suit has been played/exhausted
+			return true;
 		}
 	}
 	
@@ -77,7 +87,7 @@ champion partner(s)
 		cards = new ArrayList<Integer>();
 		singles = new ArrayList<Integer>();
 		pairs = new ArrayList<Integer>();
-		cPairs = new ArrayList<Integer>();
+		cPairs = new ArrayList<ArrayList<Integer>>();
 		int length = play.length();
 		for(int i = 0; i < length/3; i++){
 			cards.add(Integer.parseInt(play.substring(0, 3)));
@@ -104,23 +114,27 @@ champion partner(s)
 		while(i < pairs.size() && i >= 0){
 			if(pairs.get(i)%2 == 0){
 				int x = -2;
+				ArrayList<Integer> temp = new ArrayList<Integer>();
 				try{
 					while(adjacentPower(pairs.get(i), pairs.get(i+2))){
-						cPairs.add(pairs.remove(i));
-						cPairs.add(pairs.remove(i));
+						temp.add(pairs.remove(i));
+						temp.add(pairs.remove(i));
 						x++;
 					}
 					if(x!=-2){
-						cPairs.add(pairs.remove(i));
-						cPairs.add(pairs.remove(i));
+						temp.add(pairs.remove(i));
+						temp.add(pairs.remove(i));
 						i -= x;
 					}
 				}catch(IndexOutOfBoundsException e){
 					if(x!=-2){
-						cPairs.add(pairs.remove(i));
-						cPairs.add(pairs.remove(i));
+						temp.add(pairs.remove(i));
+						temp.add(pairs.remove(i));
 						i -= x;
 					}
+				}
+				if(!temp.isEmpty()){
+					cPairs.add(temp);
 				}
 			}
 			i++;
@@ -131,8 +145,11 @@ champion partner(s)
 		for(Integer num : pairs){
 			System.out.println("pairs " + num);
 		}
-		for(Integer num : cPairs){
-			System.out.println("cPairs " + num);
+		for(ArrayList<Integer> num : cPairs){
+			for(Integer num1 : num){
+				System.out.println("cPairs " + num1);
+			}
+			System.out.println();
 		}
 		int numPlays = 0;
 		if(!singles.isEmpty()){
@@ -152,18 +169,16 @@ champion partner(s)
 			System.out.println("not highest");
 		}
 		if(startTrick){
-			startTrickInfo[0] = getSuit(cards.get(0));
+			startTrickInfo = "";
+			startTrickInfo  += cards.size();
+			startTrickInfo += getSuit(cards.get(0));
 			if(!cPairs.isEmpty()){
-				startTrickInfo[2] = 1;
+				for(ArrayList<Integer> cPair : cPairs){
+					startTrickInfo += cPair.size();
+				}
 			}
-			else{
-				startTrickInfo[2] = 0;
-			}
-			if(!pairs.isEmpty() || !cPairs.isEmpty()){
-				startTrickInfo[1] = 1;
-			}
-			else{
-				startTrickInfo[1] = 0;
+			if(!pairs.isEmpty()){
+				startTrickInfo += "1";
 			}
 		}
 	}
@@ -208,8 +223,17 @@ champion partner(s)
 		if((temp2%100)/2 < levels[champion]){
 			temp2 += 2;
 		}
-		return temp/2 == (temp2/2) + 1 || temp/2 == (temp2/2) - 1;
-		
+		return temp/2 == (temp2/2) + 1 || temp/2 == (temp2/2) - 1;	
+	}
+	
+	public ArrayList<Integer> cardsInSuit(int suit){
+		ArrayList<Integer> temp = new ArrayList<Integer>();
+		for(Integer card : hand){
+			if(getSuit(card) == suit){
+				temp.add(card);
+			}
+		}
+		return temp;
 	}
 	
 	public int getSuit(int num){
