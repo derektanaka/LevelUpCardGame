@@ -38,7 +38,8 @@ public class Trick {
 		int i = 0;
 		while((tempP = playsLL.peek()) != null){
 			playsLL.pop();
-			
+			plays[i] = tempP;
+			i++;
 		}
 	}
 	
@@ -62,11 +63,10 @@ public class Trick {
 	public String toString(){
 		String ret = "";
 		Play temp =  null;
-		LinkedList<Play> tempList = playsLL;
+		Play[] p = plays;
 		int counter = 0;
-		while((temp = tempList.peek()) != null){
-			tempList.pop();
-			ret += temp.toString() + "\n";
+		for(int i = 0; i < plays.length; i++){
+			ret += plays[i] + "\n";
 			counter++;
 		}
 		if(counter > 1){
@@ -76,6 +76,7 @@ public class Trick {
 	}
 	
 	public static void main(String[] args){
+		System.out.println("hi");
 		Trick t = new Trick("03411121121123");
 		System.out.println(t.toString());
 	}

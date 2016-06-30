@@ -1,6 +1,8 @@
 package levelup;
 
+import java.awt.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class ClientModel2{
 
@@ -14,11 +16,14 @@ public class ClientModel2{
 	public int primeSuit;
 	public int sj = 22;
 	public int bj = 23;
-	
-	private ArrayList<Integer> play;
+	public LinkedList<String> toGUI = new LinkedList<String>();
+	public LinkedList<String> fromGUI = new LinkedList<String>();
+	private ArrayList<Integer> cards;
+	private ArrayList<Integer> singles;
 	private ArrayList<Integer> pairs;
 	private ArrayList<Integer> cPairs;
-	
+	private boolean startTrick;
+	private int[] startTrickInfo;
 	/*
 	 * number of players
 my number
@@ -43,54 +48,51 @@ champion partner(s)
 		Trick t = new Trick(s);
 		//tell gui how many cards to play
 		// should be given a list of 3 digit numbers indicating which cards are being played
-		
 	}
 	
-	public void pullCPs(){
-		cPairs = new ArrayList<Integer>();//reset it everytime
-		int i = 0;
-		while(i < pairs.size()){
-			
+	public boolean isLegalPlay(String play){
+		parsePlay(play, startTrick);
+		if(startTrick){
+			return sameSuit();
+		}
+		else{
+			return false;
 		}
 	}
 	
-	public void pullPs(){
-		pairs = new ArrayList<Integer>(); //reset it everytime
-		int i = 0;
-		while(i < play.size()){
-			if(play.get(i)%2 == 0){
-				try{
-					if(play.get(i)+1 == play.get(i+1)){
-						pairs.add(play.remove(i));
-						pairs.add(play.remove(i));
-					}
-					else{
-						i++;
-					}
-				}catch(IndexOutOfBoundsException e){
-					i++;
-				}
-			}
+	public boolean sameSuit(){
+		int suit = getSuit(cards.get(0));
+		boolean sameSuit = true;
+		for(Integer card : cards){
+			sameSuit = sameSuit && getSuit(card)==suit;
 		}
+		return sameSuit;
 	}
 	
 	public void parsePlay(String play){
-		ArrayList<Integer> cards = new ArrayList<Integer>();
-		ArrayList<Integer> pairs = new ArrayList<Integer>();
-		ArrayList<Integer> cPairs = new ArrayList<Integer>();
+		parsePlay(play, false);
+	}
+	
+	public void parsePlay(String play, boolean startTrick){
+		cards = new ArrayList<Integer>();
+		singles = new ArrayList<Integer>();
+		pairs = new ArrayList<Integer>();
+		cPairs = new ArrayList<Integer>();
 		int length = play.length();
 		for(int i = 0; i < length/3; i++){
 			cards.add(Integer.parseInt(play.substring(0, 3)));
+			singles.add(cards.get(i));
 			play = play.substring(3);
 		}
+		int numCards = cards.size();
 		//look for pairs
 		int i = 0;
-		while(i < cards.size()){
-			if(cards.get(i)%2 == 0){
+		while(i < singles.size()){
+			if(singles.get(i)%2 == 0){
 				try{
-					if(cards.get(i)+1 == cards.get(i+1)){
-						pairs.add(cards.remove(i));
-						pairs.add(cards.remove(i));
+					if(singles.get(i)+1 == singles.get(i+1)){
+						pairs.add(singles.remove(i));
+						pairs.add(singles.remove(i));
 						i--;
 					}
 				}catch(IndexOutOfBoundsException e){
@@ -123,7 +125,7 @@ champion partner(s)
 			}
 			i++;
 		}
-		for(Integer num : cards){
+		for(Integer num : singles){
 			System.out.println("single " + num);
 		}
 		for(Integer num : pairs){
@@ -131,6 +133,38 @@ champion partner(s)
 		}
 		for(Integer num : cPairs){
 			System.out.println("cPairs " + num);
+		}
+		int numPlays = 0;
+		if(!singles.isEmpty()){
+			numPlays++;
+		}
+		if(!pairs.isEmpty()){
+			numPlays++;
+		}
+		
+		if(!cPairs.isEmpty()){
+			numPlays++;
+		}
+		if(numPlays != 1){
+			System.out.println("highest");
+		}
+		else{
+			System.out.println("not highest");
+		}
+		if(startTrick){
+			startTrickInfo[0] = getSuit(cards.get(0));
+			if(!cPairs.isEmpty()){
+				startTrickInfo[2] = 1;
+			}
+			else{
+				startTrickInfo[2] = 0;
+			}
+			if(!pairs.isEmpty() || !cPairs.isEmpty()){
+				startTrickInfo[1] = 1;
+			}
+			else{
+				startTrickInfo[1] = 0;
+			}
 		}
 	}
 	
@@ -194,6 +228,9 @@ champion partner(s)
 		//as long as the string comes in as expected we gucci with reading
 		//lowest to highest, non prime two's , prime two's, sj bj
 		cm2.parsePlay("104105108109110111112113116117120121122123124125204205212213216217206207208209406407306307544545546");
+		cm2.parsePlay("108");
+		cm2.parsePlay("108109");
+		cm2.parsePlay("108109110");
 	}
 }
 
@@ -208,45 +245,20 @@ champion partner(s)
  * Clubs Diamonds Spades Hearts
  * Switch it up so that its black red black red
  * Will make it easier for the GUI later on
- * 006 = 3 of clubs
- * 007 = 3 of clubs
- * 008 = 4 of clubs
- * 009 = 4 of clubs
- * 010 = 5 of clubs
- * 011 = 5 of clubs
+ * 106 = 3 of clubs
+ * 107 = 3 of clubs
+ * 108 = 4 of clubs
+ * 109 = 4 of clubs
+ * 110 = 5 of clubs
+ * 111 = 5 of clubs
  * 
- * Move up cards when the prime # is higher to fill in the gap
- * if playing 4's
- * 006 = 2 of clubs
- * 007 = 2 of clubs
- * 008 = 3 of clubs
- * 009 = 3 of clubs
- * 010 = 5 of clubs
- * 011 = 5 of clubs
- * 
- * 106 = 3 of diamonds
- * 206 = 3 of spades
- * 306 = 3 of hearts
- * 406 = 3 of primes
- * 407 = 3 of primes
- * 426 = K of primes
- * 427 = K of primes
- * 428 = A of primes
- * 429 = A of primes
- * 430 = # of primes, clubs
- * 431 = # of primes, clubs
- * 432 = # of primes, diamonds
- * 433 = # of primes, diamonds
- * 434 = # of primes, spades
- * 435 = # of primes, spades
- * 436 = # of primes, hearts
- * 437 = # of primes, hearts
- * 438 = prime #
- * 439 = prime #
- * 440 = sj
- * 441 = sj
- * 442 = bj
- * 443 = bj
+ * 206 = 3 of diamonds
+ * 306 = 3 of spades
+ * 406 = 3 of hearts
+ * 500 = sj
+ * 501 = sj
+ * 503 = bj
+ * 504 = bj
  * 
  * just send cards and have it figured out locally yolo lmao
  * so when I send info, if there is a pair, the numbers will be next to each other hopefully
